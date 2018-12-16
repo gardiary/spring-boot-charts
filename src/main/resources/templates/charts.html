@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Spring Boot Highcharts Demo</title>
+
+    <link rel="stylesheet" th:href="@{/css/main.css}" href="../../css/main.css" />
+    <link rel="stylesheet" th:href="@{/css/highcharts.css}" href="../../css/highcharts.css" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}" href="../../css/bootstrap.css" />
+
+    <script th:src="@{/js/jquery-3.2.1.min.js}" src="../../js/jquery-3.2.1.min.js"></script>
+    <script th:src="@{/js/highcharts.js}" src="../../js/highcharts.js"></script>
+    <script th:src="@{/js/exporting.js}" src="../../js/exporting.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            loadWorldwideSalesResult();
+            loadBrowserMarketResult();
+        });
+
+        function loadWorldwideSalesResult(params) {
+            $.get("/ajax/worldwide_sales_result", params, function (data, textStatus, jqXHR) {
+                console.log('textStatus : ' + textStatus);
+                console.log('result : ' + JSON.stringify(data));
+
+                if (textStatus == 'success') {
+
+                    $('#barChartContainer').highcharts({
+                        chart: {
+                            type: 'bar'
+                        },
+                        title: {
+                            text: data.title
+                        },
+                        xAxis: {
+                            categories: data.categories,
+                            title: {
+                                text: null
+                            }
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: 'Dollars (millions)',
+                                align: 'high'
+                            },
+                            labels: {
+                                overflow: 'justify'
+                            }
+                        },
+                        tooltip: {
+                            valueSuffix: ' millions'
+                        },
+                        plotOptions: {
+                            bar: {
+                                dataLabels: {
+                                    enabled: true
+                                }
+                            }
+                        },
+                        legend: {
+                            layout: 'vertical',
+                            align: 'right',
+                            verticalAlign: 'top',
+                            x: -40,
+                            y: 80,
+                            floating: true,
+                            borderWidth: 1,
+                            backgroundColor: '#FAFAFA',
+                            shadow: true
+                        },
+                        credits: {
+                            enabled: false
+                        },
+                        series: data.series
+                    });
+                } else {
+                    console.log('Unable to retrive data');
+                }
+
+            });
+        }
+
+        function loadBrowserMarketResult(params) {
+            $.get("/ajax/browser_market_result", params, function (data, textStatus, jqXHR) {
+                console.log('textStatus : ' + textStatus);
+                console.log('result : ' + JSON.stringify(data));
+
+                if (textStatus == 'success') {
+
+                    $('#pieChartContainer').highcharts({
+                        chart: {
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            type: 'pie'
+                        },
+                        title: {
+                            text: data.title
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                    style: {
+                                        color: 'black'
+                                    }
+                                }
+                            }
+                        },
+                        series: data.series
+                    });
+                } else {
+                    console.log('Unable to retrive data');
+                }
+
+            });
+        }
+
+    </script>
+</head>
+<body>
+<div id="wrapper">
+    <h2>Bar Chart</h2>
+    <div id="barChartContainer"></div>
+
+    <h2>Pie Chart</h2>
+    <div id="pieChartContainer"></div>
+</div>
+
+<script th:src="@{/js/bootstrap.min.js}" src="../../js/bootstrap.min.js"></script>
+
+</body>
+</html>
